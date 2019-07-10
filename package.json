@@ -4,10 +4,12 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build"
+    "build": "vue-cli-service build",
+    "lib": "vue-cli-service build --target lib --name vue-drag-screenshot --dest lib packages/index.js"
   },
   "dependencies": {
     "core-js": "^2.6.5",
+    "svg.js": "^2.7.1",
     "vue": "^2.6.10"
   },
   "devDependencies": {
