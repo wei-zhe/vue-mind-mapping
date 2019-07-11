@@ -4,19 +4,22 @@ class sprite { // h 60 w 200
     constructor(dom, data, superior, editor ) {
         
         this.dom      = dom;
-        this.group    = dom.group().move(data.x, data.y);
         this.superior = superior; // 父级信息
         this.editor   = editor;   // 全局信息
+        
         this.data     = data;
-        this.index    = data.index;
-        this.minY     = data.minY,
+        this.x        = data.x;
+        this.y        = data.y;
+        this.id       = data.id;
         this.maxY     = data.maxY,
+        this.minY     = data.minY,
+        this.index    = data.index;
         this.color    = data.color;
+        this.group    = dom.group().move(this.x, this.y);
         
         this.sprites  = [];
         this.width    = 0;
         this.height   = 0;
-        this.id       = data.id;
 
         this.font  = {
             size   : data.size,
@@ -84,7 +87,7 @@ class sprite { // h 60 w 200
 
         if(this.index > 0){
             
-            this.pathLine   =  this.group.path().attr({
+            this.pathLine   =  this.group.path().fill('transparent').attr({
                 stroke: this.color, 
                 'stroke-width' : 4,
                 'marker-start' : 'url(#'+ this.editor.arrowEnd.id() +')',
@@ -160,7 +163,7 @@ class sprite { // h 60 w 200
         });
         this.title.rect.move(0, 0);
         this.title.text.move(5, 5);
-        this.group.move(this.data.x, this.data.y - (height/2));
+        this.group.move(this.x, this.y - (height/2));
         
         if(this.index > 0){
 
@@ -186,23 +189,32 @@ class sprite { // h 60 w 200
         },
             start = {
                 x : -this.editor.spacing,
-                y :  Math.round(-(this.data.y - (height + 11))),
+                y :  Math.round(-(this.y - (height + 11))),
         };
            
             
         let judgeY = start.y - end.y;
+        let startLineC = '';
         if(judgeY < 5 && judgeY > -5 ){
             
             end.y = start.y;
+            startLineC = ' L ' + end.x + ',' + start.y;
+        }else{
+            startLineC = 'C ' + (start.x) + ',' + (end.y) 
+                                    + ' ' + 
+                                (start.x + 40) + ',' + (end.y) 
+                                    + ' ' + 
+                                (end.x) + ',' + (end.y);
+                                // 'S '+ end.x - 20 + ' ' + end.y + end.x + ',' + end.y;
         }
-            
-        let line = 'M ' + start.x + ',' + start.y + ' L ' + end.x + ',' + end.y;
+
+        let line = 'M ' + start.x + ',' + start.y + startLineC ;
         return line;
     }
 
     movePosition(data){
-        this.data.x = data.x || this.data.x; 
-        this.data.y = data.y || this.data.y;
+        this.x      = data.x || this.data.x;
+        this.y      = data.y || this.data.y;
         this.autoPosition();
     }
 
@@ -366,7 +378,6 @@ export default class {
 
     settingSVGSize(data){
         
-        console.log(data)
         let {width, height} = data;
         if(width  != this.width || height != this.height){
 
