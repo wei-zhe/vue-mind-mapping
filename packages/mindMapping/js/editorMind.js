@@ -86,8 +86,9 @@ class sprite { // h 60 w 200
             
             this.pathLine   =  this.group.path().attr({
                 stroke: this.color, 
-                'stroke-width': 4,
-                'marker-start' : 'url(#'+ this.editor.arrow.id() +')',
+                'stroke-width' : 4,
+                'marker-start' : 'url(#'+ this.editor.arrowEnd.id() +')',
+                'marker-end'   : 'url(#'+ this.editor.arrowStart.id() +')',
             });
             
             this.removeBtn     = this.group.group().attr({ 'cursor' : 'pointer'});        // 添加
@@ -162,7 +163,7 @@ class sprite { // h 60 w 200
         
         if(this.index > 0){
 
-            this.pathLine.attr({ d : 'M -20 ' + ( (height + 14) / 2 ) + ' L ' + -80 + ' ' + -(this.data.y - (height + 14))});
+            this.pathLine.attr({ d : this.getSuperiorLine(height)});
             
             this.addBtn.move(width + 4 + 15, (height + 14)/2 - 20);
             this.removeBtn.move(width + 4 + 15, (height + 14)/2 + 5);
@@ -173,7 +174,39 @@ class sprite { // h 60 w 200
         this.width    = width + 45;
         this.height   = height;
         
+        if(this.editor.title){
 
+            let bbox = this.editor.title.group.bbox()
+            let {width, height} = bbox;
+            width  = Math.round( width + 10);
+            height = Math.round( height + 10);
+            
+            width  = this.editor.width  > width  ? this.editor.width  : width;
+            height = this.editor.height > height ? this.editor.height : height;
+            this.editor.settingSVGSize({ width , height });
+        }
+
+    }
+
+    getSuperiorLine(height){
+        let end = {
+            x : -20,
+            y :  Math.round(( (height + 14) / 2 )),
+        },
+            start = {
+                x : -this.editor.spacing,
+                y :  Math.round(-(this.data.y - (height + 11))),
+        };
+           
+            
+        let judgeY = start.y - end.y;
+        if(judgeY < 3 && judgeY > -3 ){
+            
+            end.y = start.y;
+        }
+            
+        let line = 'M ' + start.x + ',' + start.y + ' L ' + end.x + ',' + end.y;
+        return line;
     }
 
     movePosition(data){
@@ -196,14 +229,14 @@ class sprite { // h 60 w 200
 
         }else if(spritesLength){
             this.sprites[0].movePosition({
-                x : this.width + 80,
+                x : this.width + this.editor.spacing,
                 y : this.height / 2,
             });
         }   
     }
 
     addSprite(e){
-        let spriteX = this.width + 80,
+        let spriteX = this.width + this.editor.spacing,
             spriteY = this.height / 2;
         let spritesLength = this.sprites.length;
 
@@ -255,11 +288,17 @@ export default class {
 
         this.width  = data.width;
         this.height = data.height;
+        this.spacing= data.spacing || 80;
         this.dom.size(this.width, this.height);
-        this.arrow = this.dom.defs().marker(9, 9, (add) => {
-            add.path("M0,0 L0,6 L9,3 z").fill('#000000');
+
+        this.iconDom    = this.dom.defs()
+        this.arrowStart = this.iconDom.marker(6, 6, (add) => {
+            add.attr({ orient : "auto" })
+            add.path("M1,1 L5,3 L1,5 L3,3 L1,1").fill('red');
         }); 
-        console.log(this.arrow.id())
+        this.arrowEnd   = this.iconDom.marker(3, 3, (add) => {
+            add.circle(3).fill('#f06');
+        }); 
 
         this.colorList = [
             '#414042',
@@ -275,7 +314,7 @@ export default class {
                 title : '创建标题',
                 index : 0,
                 x     : 5,
-                y     : data.height/2,
+                y     : this.height/2,
                 color : '#ff2970',
                 id    : this.UUID.generate(),
                 minY  : 0,
@@ -315,5 +354,19 @@ export default class {
             this,
         );
         return item;
+    }
+
+    settingSVGSize(data){
+        
+        let {width, height} = data;
+        console.log( this.width , this.height, data)
+        if(width  != this.width || height != this.height){
+
+            this.width  = width;
+            this.height = height;
+            this.dom.size(this.width, this.height);
+            this.title.movePosition({ y : this.height/2 });
+        }
+
     }
 }

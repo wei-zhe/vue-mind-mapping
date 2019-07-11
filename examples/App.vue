@@ -46,8 +46,7 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   >div{
-    margin: 0 auto;
-    margin-top: 100px;
+    margin: 50px auto;
   }
 }
 body {

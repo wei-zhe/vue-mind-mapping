@@ -3,22 +3,24 @@
     class="mindMapping" 
     ref="wTextarea" 
     :style = "{
-      width  : this.width  + 'px',
-      height : this.height + 'px',
+      width  : this.editor.width  + 'px',
+      height : this.editor.height + 'px',
     }"
   >
-    <div id='editorMindSVGDom'></div>
+    <div :id='editorId'></div>
   </div>
 </template>
 
 <script>
 import EditorMind from  '../js/editorMind.js'
+import UUID from '../js/uuid.js';
 
 export default {
   name: 'MindMapping',
   data() {
     return {
       editor : '',
+      editorId : 'editor_',
     };
   },
   props: {
@@ -66,17 +68,31 @@ export default {
 
   },
   mounted() {
-    // 初始化数据
-    this.editor = new EditorMind(
-      this.$svg,
-      {
-        domId : 'editorMindSVGDom',
-        width  : this.width,
-        height : this.height,
+    let uuid = new UUID();
+    this.editorId = this.editorId + uuid.generate();
+
+    let setTime = setInterval(() => {
+
+      let dom = document.getElementById(this.editorId)
+      if (dom) {
+    
+        this.editor = new EditorMind(
+          this.$svg,
+          {
+            domId   : this.editorId, // 目标元素id
+            width   : this.width,         // 宽
+            height  : this.height,        // 高
+            spacing : 80,                 // 标题之间的间距
+          }
+        );
+    
+        this.editor.fromJson();
+        window.TOOL = this.editor;
+        clearInterval(setTime);
       }
-    );
-    this.editor.fromJson();
-    window.TOOL = this.editor;
+    });
+    
+    // 初始化数据
   },
   methods: {
     openTagDialog(type) {
