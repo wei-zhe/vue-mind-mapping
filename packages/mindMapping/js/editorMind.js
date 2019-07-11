@@ -118,6 +118,7 @@ class sprite { // h 60 w 200
                         
                         sprite.group.remove();
                         this.superior.sprites.splice(i, 1);  
+                        this.settingSVGSize();
                         break;
                     }
                 }
@@ -174,17 +175,7 @@ class sprite { // h 60 w 200
         this.width    = width + 45;
         this.height   = height;
         
-        if(this.editor.title){
-
-            let bbox = this.editor.title.group.bbox()
-            let {width, height} = bbox;
-            width  = Math.round( width + 10);
-            height = Math.round( height + 10);
-            
-            width  = this.editor.width  > width  ? this.editor.width  : width;
-            height = this.editor.height > height ? this.editor.height : height;
-            this.editor.settingSVGSize({ width , height });
-        }
+        this.settingSVGSize();
 
     }
 
@@ -200,7 +191,7 @@ class sprite { // h 60 w 200
            
             
         let judgeY = start.y - end.y;
-        if(judgeY < 3 && judgeY > -3 ){
+        if(judgeY < 5 && judgeY > -5 ){
             
             end.y = start.y;
         }
@@ -276,6 +267,20 @@ class sprite { // h 60 w 200
         })
         this.sprites.push(item);
     }
+
+    settingSVGSize(){
+        if(this.editor.title){
+
+            let bbox = this.editor.title.group.bbox()
+            let {width, height} = bbox;
+            width  = Math.round( width + 10);
+            height = Math.round( height + 10);
+            
+            width  = this.editor.oldWidth  > width  ? this.editor.oldWidth  : width;
+            height = this.editor.oldHeight > height ? this.editor.oldHeight : height;
+            this.editor.settingSVGSize({ width , height });
+        }
+    }
     
 };
 
@@ -286,8 +291,11 @@ export default class {
         this.data = data;
         this.dom  = this.SVG(data.domId);
 
-        this.width  = data.width;
-        this.height = data.height;
+        this.width     = data.width;
+        this.height    = data.height;
+        this.oldWidth  = data.width;
+        this.oldHeight = data.height;
+
         this.spacing= data.spacing || 80;
         this.dom.size(this.width, this.height);
 
@@ -358,8 +366,8 @@ export default class {
 
     settingSVGSize(data){
         
+        console.log(data)
         let {width, height} = data;
-        console.log( this.width , this.height, data)
         if(width  != this.width || height != this.height){
 
             this.width  = width;
