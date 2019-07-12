@@ -213,8 +213,8 @@ class sprite { // h 60 w 200
     }
 
     movePosition(data){
-        this.x      = data.x || this.data.x;
-        this.y      = data.y || this.data.y;
+        this.x      = data.x || this.x;
+        this.y      = data.y || this.y;
         this.autoPosition();
     }
 
@@ -222,12 +222,12 @@ class sprite { // h 60 w 200
         let spritesLength = this.sprites.length;
         if(spritesLength > 1){
             let allHeight = ( spritesLength );
-                allHeight = (allHeight * 120) / 2;
+                allHeight = (allHeight * ((this.height + 14) * 2)) / 2;
 
-            let top       = (this.height/2) - allHeight + 60;
+            let top       = (this.height/2) - allHeight + (this.height + 14);
             for(let i = 0; i < spritesLength; i++){
                 let sprite = this.sprites[i];
-                sprite.movePosition({y : top + ( 120 * i ) })
+                sprite.movePosition({y : top + ( ((this.height + 14) * 2) * i ) })
             }
 
         }else if(spritesLength){
@@ -245,17 +245,20 @@ class sprite { // h 60 w 200
 
         if(spritesLength){
             let allHeight = ( spritesLength + 1 );
-                allHeight = (allHeight * 120) / 2;
+                allHeight = (allHeight * ((this.height + 14) * 2)) / 2;
 
-            let top       = (this.height/2) - allHeight + 60;
+            let top       = (this.height/2) - allHeight + (this.height + 14);
+
             for(let i = 0; i < spritesLength; i++){
+
                 let sprite = this.sprites[i];
-                sprite.movePosition({y : top + ( 120 * i ) })
+                let y = top + ( ((this.height + 14) * 2) * i );
+
+                sprite.movePosition({y : y})
             }
 
-            spriteY = (this.height / 2) + allHeight - 60;
+            spriteY = (this.height / 2) + allHeight - (this.height + 14);
         }
-
         let color = this.color;
         if(this.index == 0){
             color = this.superior.colorList[ this.sprites.length % 5 ];
@@ -265,32 +268,26 @@ class sprite { // h 60 w 200
         size = Math.round(size);
         size = size > 14 ? size : 14;
 
-        let item = this.editor.addSprite({
+        this.editor.addSprite({
             x     : spriteX,
             y     : spriteY,
             index : this.index,
             dom   : this.group,
-            id    : this.id + '_' + this.sprites.length,
+            id    : this.id + '&&' + this.sprites.length,
             color : color,
             minY  : this.minY,
             maxY  : this.maxY,
             data  : this,
             size  : size,
-        })
-        this.sprites.push(item);
+        }).then(item => {
+            this.sprites.push(item);
+            this.editor.settingSVGSize(item);
+        });
     }
 
     settingSVGSize(){
         if(this.editor.title){
-
-            let bbox = this.editor.title.group.bbox()
-            let {width, height} = bbox;
-            width  = Math.round( width + 10);
-            height = Math.round( height + 10);
-            
-            width  = this.editor.oldWidth  > width  ? this.editor.oldWidth  : width;
-            height = this.editor.oldHeight > height ? this.editor.oldHeight : height;
-            this.editor.settingSVGSize({ width , height });
+            this.editor.settingSVGSize();
         }
     }
     
@@ -373,12 +370,23 @@ export default class {
             data.data,
             this,
         );
-        return item;
+        return Promise.resolve(item);
     }
 
     settingSVGSize(data){
-        
-        let {width, height} = data;
+
+        if(data){
+
+            console.log(data.id);
+        }
+
+        let bbox = this.title.group.bbox()
+            let {width, height} = bbox;
+            width  = Math.round( width + 10);
+            height = Math.round( height + 10);
+            
+            width  = this.oldWidth  > width  ? this.oldWidth  : width;
+            height = this.oldHeight > height ? this.oldHeight : height;
         if(width  != this.width || height != this.height){
 
             this.width  = width;
