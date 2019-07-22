@@ -82,7 +82,7 @@ export default {
             domId   : this.editorId, // 目标元素id
             width   : this.width,         // 宽
             height  : this.height,        // 高
-            spacing : 80,                 // 标题之间的间距
+            spacing : 50,                 // 标题之间的间距
           }
         );
     

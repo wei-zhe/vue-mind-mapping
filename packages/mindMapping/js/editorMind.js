@@ -41,7 +41,7 @@ class sprite { // h 60 w 200
         this.addBtnC    = this.addBtn.circle(15).fill('#d1d3d5');                  // 添加
         this.addBtn.text('+').font({size   : 15,}).fill('#fff').move(3, -3);       // 添加
         this.addBtnMask = this.addBtn.rect(15, 15).fill('transparent').move(0, 0); // 添加
-        
+
         let dblclickFS  = (e)=>{
             console.log(e);
             },
@@ -96,7 +96,7 @@ class sprite { // h 60 w 200
             
             this.removeBtn     = this.group.group().attr({ 'cursor' : 'pointer'});        // 添加
             this.removeBtnC    = this.removeBtn.circle(15).fill('#d1d3d5');                  // 添加
-            this.removeBtn.text('x').font({size   : 15,}).fill('#fff').move(4, -3);       // 添加
+            this.removeBtn.text('-').font({size   : 20,}).fill('#fff').move(4, -5);       // 添加
             this.removeBtnMask = this.removeBtn.rect(15, 15).fill('transparent').move(0, 0); // 添加
             
             let removeMouseover = (e)=>{
@@ -104,29 +104,40 @@ class sprite { // h 60 w 200
                     fill: this.color, 
                     'fill-opacity': 1, 
                 });
-            },
-            removeMouseout  = (e)=>{
-            
-                this.removeBtnC.animate(200).attr({
-                    fill: '#d1d3d5', 
-                    'fill-opacity': 1, 
-                });
-            },
-            removeClick     = (e)=>{
-                for(let i = 0; i < this.superior.sprites.length; i++){
-                    
-                    let sprite = this.superior.sprites[i];
-                    
-                    if(this.id == sprite.id){
+                },
+                removeMouseout  = (e)=>{
+                
+                    this.removeBtnC.animate(200).attr({
+                        fill: '#d1d3d5', 
+                        'fill-opacity': 1, 
+                    });
+                },
+                removeClick     = (e)=>{
+                    let sptireData = '';
+
+                    for(let i = 0; i < this.superior.sprites.length; i++){
                         
-                        sprite.group.remove();
-                        this.superior.sprites.splice(i, 1);  
-                        this.settingSVGSize();
-                        break;
+                        let sprite = this.superior.sprites[i];
+                            
+                        if(this.id == sprite.id){
+                            sptireData = i == 0 ? 
+                                            this.superior.sprites[1] 
+                                        : 
+                                            (
+                                                i == (this.superior.sprites.length - 1) ? 
+                                                        this.superior.sprites[this.superior.sprites.length - 2]
+                                                    :
+                                                this.superior.sprites[i + 1]
+                                            );
+
+                            sprite.group.remove();
+                            this.superior.sprites.splice(i, 1);  
+                            this.settingSVGSize();
+                            break;
+                        }
                     }
-                }
-                this.superior.spritesPosition();
-            };
+                    this.superior.spritesPosition(sptireData);
+                };
             this.removeBtnMask.mouseover(removeMouseover);
             this.removeBtnMask.mouseout(removeMouseout);
             this.removeBtnMask.click(removeClick);
@@ -175,8 +186,8 @@ class sprite { // h 60 w 200
 
             this.addBtn.move(width + 4 + 15, (height + 14)/2 - 8);
         }
-        this.width    = width + 45;
-        this.height   = height;
+        this.width    = width  + 45;
+        this.height   = height + 10;
         
         this.settingSVGSize();
 
@@ -202,7 +213,7 @@ class sprite { // h 60 w 200
         }else{
             startLineC = 'C ' + (start.x) + ',' + (end.y) 
                                     + ' ' + 
-                                (start.x + 40) + ',' + (end.y) 
+                                (start.x + 30) + ',' + (end.y) 
                                     + ' ' + 
                                 (end.x) + ',' + (end.y);
                                 // 'S '+ end.x - 20 + ' ' + end.y + end.x + ',' + end.y;
@@ -218,47 +229,22 @@ class sprite { // h 60 w 200
         this.autoPosition();
     }
 
-    spritesPosition(){
-        let spritesLength = this.sprites.length;
-        if(spritesLength > 1){
-            let allHeight = ( spritesLength );
-                allHeight = (allHeight * ((this.height + 14) * 2)) / 2;
+    spritesPosition(data){ // 删除没有写完
+        let posSprite = (data)=>{
 
-            let top       = (this.height/2) - allHeight + (this.height + 14);
-            for(let i = 0; i < spritesLength; i++){
-                let sprite = this.sprites[i];
-                sprite.movePosition({y : top + ( ((this.height + 14) * 2) * i ) })
+            this.editor.getSpriteY(data, 0);
+            if(data.superior && data.superior.sprites){
+                posSprite(data.superior)
             }
-
-        }else if(spritesLength){
-            this.sprites[0].movePosition({
-                x : this.width + this.editor.spacing,
-                y : this.height / 2,
-            });
-        }   
+        }
+        posSprite(data)
     }
 
     addSprite(e){
         let spriteX = this.width + this.editor.spacing,
-            spriteY = this.height / 2;
-        let spritesLength = this.sprites.length;
+            spriteY = this.editor.getSpriteY(this, 1),
+            bboxData= this.getSpriteHeight();
 
-        if(spritesLength){
-            let allHeight = ( spritesLength + 1 );
-                allHeight = (allHeight * ((this.height + 14) * 2)) / 2;
-
-            let top       = (this.height/2) - allHeight + (this.height + 14);
-
-            for(let i = 0; i < spritesLength; i++){
-
-                let sprite = this.sprites[i];
-                let y = top + ( ((this.height + 14) * 2) * i );
-
-                sprite.movePosition({y : y})
-            }
-
-            spriteY = (this.height / 2) + allHeight - (this.height + 14);
-        }
         let color = this.color;
         if(this.index == 0){
             color = this.superior.colorList[ this.sprites.length % 5 ];
@@ -268,12 +254,13 @@ class sprite { // h 60 w 200
         size = Math.round(size);
         size = size > 14 ? size : 14;
 
+        spriteY.spriteY = spriteY.spriteY - 5;
         this.editor.addSprite({
             x     : spriteX,
-            y     : spriteY,
+            y     : spriteY.spriteY,
             index : this.index,
             dom   : this.group,
-            id    : this.id + '&&' + this.sprites.length,
+            id    : this.id + '___' + this.sprites.length,
             color : color,
             minY  : this.minY,
             maxY  : this.maxY,
@@ -281,16 +268,43 @@ class sprite { // h 60 w 200
             size  : size,
         }).then(item => {
             this.sprites.push(item);
-            this.editor.settingSVGSize(item);
+            this.spritesPosition(item);
         });
     }
 
     settingSVGSize(){
+        
         if(this.editor.title){
             this.editor.settingSVGSize();
         }
     }
+
+    getSpriteHeight(){
+        let height = 0;
+        if(this.sprites.length > 1){
+            height = this.sprites[0].group.bbox().height + this.sprites[this.sprites.length - 1].group.bbox().height;
+        }
+        return height;
+    }
     
+    removeHeightFS(id,height){
+
+        let idArray = id.split('___'),
+            spritesLength = this.editor.title.sprites,
+            lastSprites   = spritesLength[spritesLength.length -1];
+
+        if(idArray[1] == 0 || idArray[1] == (spritesLength.length -1) ){
+            
+            for(let i = 1; i < idArray.length; i++){
+                let index = idArray[i];
+                
+                if(index == 0 || index == (lastSprites.sprites.length - 1)){
+                    height = height/2; 
+                }
+            }
+        }
+        return height;
+    }
 };
 
 
@@ -305,7 +319,7 @@ export default class {
         this.oldWidth  = data.width;
         this.oldHeight = data.height;
 
-        this.spacing= data.spacing || 80;
+        this.spacing= data.spacing || 50;
         this.dom.size(this.width, this.height);
 
         this.iconDom    = this.dom.defs()
@@ -373,27 +387,115 @@ export default class {
         return Promise.resolve(item);
     }
 
-    settingSVGSize(data){
-
-        if(data){
-
-            console.log(data.id);
-        }
+    settingSVGSize(){
 
         let bbox = this.title.group.bbox()
             let {width, height} = bbox;
             width  = Math.round( width + 10);
             height = Math.round( height + 10);
             
-            width  = this.oldWidth  > width  ? this.oldWidth  : width;
-            height = this.oldHeight > height ? this.oldHeight : height;
+            width  = this.oldWidth  >= width  ? this.oldWidth  : width;
+            height = this.oldHeight >= height ? this.oldHeight : height;
         if(width  != this.width || height != this.height){
 
             this.width  = width;
             this.height = height;
+            let titleY = this.oldHeight >= height ? 
+                    (this.height/2) 
+                : 
+                    (-bbox.y + (this.title.height / 2));
             this.dom.size(this.width, this.height);
-            this.title.movePosition({ y : this.height/2 });
+            this.title.movePosition({ y : titleY});
         }
 
+    }
+    
+    getSelectSprite(id){
+        let spriteData = [];
+        let spriteDataFS = (data) => {
+            
+            
+            for(let i = 0; i < data.length; i++){
+                let sprite = data[i];
+                
+                if(id == sprite.id){
+                    spriteData = Object.assign({}, sprite);
+                    return spriteData;
+                }
+
+                if(sprite.sprites.length){
+                    spriteDataFS(sprite.sprites);
+                }
+            }
+        };
+        
+        spriteDataFS(this.title.sprites);
+        return spriteData;                    
+    }
+
+    getSpriteY(data, num){
+        if(data){
+
+            let spriteY       =  data.height / 2;
+            let spritesLength = data.sprites.length;
+            let spriteHeight  = 0;
+
+            if(spritesLength){
+                let heightSprite = data.sprites[0].height;
+                let allHeight = ( spritesLength + num ),
+                    addHeight = 0;
+                    allHeight = (allHeight * (heightSprite * 2));
+                
+                for(let i = 0; i < spritesLength; i++){
+
+                    let sprite = data.sprites[i];
+                    let addH   = (sprite.getSpriteHeight() ? (sprite.getSpriteHeight() - (sprite.height - 20)) : 0);
+                    // if(i = 0 || i == (spritesLength - 1)){
+                    //     addH = addH/2;
+                    // }
+                    addHeight += addH;
+
+                }
+
+                let top       = -((allHeight + addHeight) / 2) + (heightSprite / 2) + heightSprite;
+                console.log(top, heightSprite,  allHeight, heightSprite)
+                
+                for(let i = 0; i < spritesLength; i++){
+
+                    let sprite = data.sprites[i];
+                    let y = top + ( (heightSprite * 2) * i ); // 5是背景遮照的多余距离
+                    
+                    if(i > 0){
+
+                        if(data.sprites[i - 1]){
+
+                            y =  data.sprites[i - 1].y + (
+                                    (
+                                        data.sprites[i - 1].getSpriteHeight() ? 
+                                            ((data.sprites[i - 1].getSpriteHeight() / 2) + (data.sprites[i - 1].height / 2 + data.sprites[i - 1].height)) 
+                                        : 
+                                            ((data.sprites[i - 1].height) * 2)
+                                    )
+                                );
+                        }
+                    }
+                    if(sprite.getSpriteHeight()){
+                        y += ((sprite.getSpriteHeight() / 2) - 20);
+                    }
+                    sprite.movePosition({y : y})
+                }
+                let h = data.sprites[ data.sprites.length - 1 ].y
+                            +
+                        (data.sprites[ data.sprites.length - 1 ].getSpriteHeight() / 2);
+
+                spriteHeight = (data.sprites[ data.sprites.length - 1 ].getSpriteHeight() / 2);
+                               
+                spriteY = (heightSprite / 2) + h + (heightSprite * 2) -20;
+                // spriteY = allHeight/2 - (heightSprite / 2) + (addHeight);
+            }
+            return {
+                spriteY, 
+            };
+        }
     }
 }
