@@ -1,13 +1,14 @@
 <template>
   <div id="app">
+    <div>{{this.testData}}</div>
     <MindMapping 
-      v-model="testData"
-      tag="wise" 
-      ref="testText"
-      maxlength="100"
-      :width  = 'width'
-      :height = 'height'
-      @add="handleAdd"
+      v-model     = "testData"
+      :width      = 'width'
+      :height     = 'height'
+      :spacing    = '100'
+      topColor    = '#ddd'
+      :fontSize   = '50'
+      :fontLength = '10'
     ></MindMapping>
   </div>
 </template>
@@ -21,21 +22,16 @@ export default {
   },
   data () {
     return {
-      testData : '',
+      testData : '{"x":5,"y":400,"title":"创建标题","index":0,"color":"#ddd","size":50,"sprites":[{"x":345,"y":-196,"title":"创建标题","index":1,"color":"#f9c0d2","size":40,"sprites":[]},{"x":345,"y":-84,"title":"创建标题","index":1,"color":"#fd32da","size":40,"sprites":[]},{"x":345,"y":28,"title":"创建标题","index":1,"color":"#d28f7f","size":40,"sprites":[]},{"x":345,"y":140,"title":"创建标题","index":1,"color":"#c997bb","size":40,"sprites":[]},{"x":345,"y":252,"title":"创建标题","index":1,"color":"#d03643","size":40,"sprites":[]}]}',
       width    : 1000,
       height   : 800,
     }
   },
   mounted() {
+
   },
   methods: {
-    handleAdd (type) {
-      if (type === 'tag') {
-        this.show = true
-      } else {
-        console.log(type)
-      }
-    },
+    
   }
 }
 </script>

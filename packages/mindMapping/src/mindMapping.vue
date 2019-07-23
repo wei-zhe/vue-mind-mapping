@@ -7,7 +7,21 @@
       height : this.editor.height + 'px',
     }"
   >
-    <div :id='editorId'></div>
+    <div :id='editorId' :ref ='editorId'></div>
+    
+    <div 
+      class="input_text"
+      v-if="this.selectId"
+      :style="selectBoxStyle"
+      @click="stopDocument($event)"
+    >
+      <input 
+        class="input_message" 
+        v-model="titleData.message"
+        :style="selectInputStyle"
+        v-on:keyup.enter="setTitle()"
+      >
+    </div>
   </div>
 </template>
 
@@ -19,50 +33,52 @@ export default {
   name: 'MindMapping',
   data() {
     return {
-      editor : '',
+      editor   : '',
       editorId : 'editor_',
+      selectId : '',
+      selectBoxStyle   : '', 
+      selectInputStyle : '',
+      titleData : {
+        message : ''
+      },
     };
   },
+  model: {
+    prop  : 'value',//绑定的值，通过父组件传递
+    event : 'update_value'//自定义时间名
+  },
   props: {
-    value: {
-      type: String,
-      default: ''
+    value     : {
+      type    : String,
+      default : '',
     },
-    tag: {        // 自定义模版标签的标签名
-      type: String,
-      // 默认使用wise作为标签名，并添加了默认样式
-      // 当使用其他标签名的时候，需要另写标签样式
-      default: 'wise'
+    width     : {
+      type    : Number,
+      default : 500,
     },
-    tools: {      // 自定义扩展功能：超链接'link'，模版标签'tag'
-      type: Array,
-      default () {
-        return [
-          { type: 'link', text: '添加超链接' },
-          { type: 'tag', text: '添加模版标签' }
-        ]
-      }
+    height    : {
+      type    : Number,
+      default : 500,
     },
-    maxlength: {  // 最大输入长度
-      type: [String, Number],
-      default: ''
+    spacing   : {    // 标签横向相距距离
+      type    : Number,
+      default : 50
     },
-    width  : {
-      type: [String, Number],
-      default: 500,
+    topColor  : {    // 标签横向相距距离
+      type    : String,
+      default : '#ff2970'
     },
-    height : {
-      type: [String, Number],
-      default: 500,
+    fontSize  : {
+      type    : Number,
+      default : 40,
+    },
+    fontLength: {
+      type    : Number,
+      default : 7,
     },
   },
   watch: {
-    value(val) {
-      // 非锁定状态下，实时更新innerHTML
-      if (!this.isLocked) {
-        this.$refs.wTextareaContent.innerHTML = val;
-      }
-    }
+
   },
   computed: {
 
@@ -79,27 +95,66 @@ export default {
         this.editor = new EditorMind(
           this.$svg,
           {
-            domId   : this.editorId, // 目标元素id
-            width   : this.width,         // 宽
-            height  : this.height,        // 高
-            spacing : 50,                 // 标题之间的间距
+            domId     : this.editorId,   // 目标元素id
+            width     : this.width,      // 宽
+            height    : this.height,     // 高
+            spacing   : this.spacing,    // 标题之间的间距
+            topColor  : this.topColor,   // 标题颜色以及箭头颜色   
+            fontStyle : {                
+              size : this.fontSize,      // 标题文字大小，下一级标题文字大小是上一级的0.8最小是14
+              num  : this.fontLength,    // 每个标题显示的字数显示不玩的会用...代替
+            },
+            dubclickFS: this.editorDubclick,
+            toJsonFS  : this.toJsonFS, 
           }
         );
     
-        this.editor.fromJson();
         window.TOOL = this.editor;
+        if(this.value){
+          console.log(this.value)
+          this.editor.fromJson(this.value)
+        }
         clearInterval(setTime);
       }
     });
+
+    document.onclick = (event) => {
+      this.selectId = '';
+    };
     
     // 初始化数据
   },
   methods: {
-    openTagDialog(type) {
-      // 将事件抛给父组件处理
-      // 处理后需要调用 addTag() 或者 addLink() 将内容传回来
-      this.$emit('add', type)
+    editorDubclick(e, data){
+
+      let dom = this.$refs[this.editorId].getBoundingClientRect();
+      e   = e.target.getBoundingClientRect();
+      
+      this.selectId = data;
+      this.selectInputStyle = this.selectBoxStyle = {
+        width      : e.width  + 'px',
+        height     : e.height + 'px',
+        top        : e.y - dom.y  + 'px',
+        left       : e.x - dom.x  + 'px',
+        fontSize   : this.selectId.font.size + 'px',
+        fontWeight : 'bold',
+      };
+
+      this.titleData.message       = this.selectId.title.tit;
+      this.selectInputStyle.width  = e.width  - 6  + 'px';
+      this.selectInputStyle.height = e.height - 2  + 'px';
+      
     },
+    setTitle(){
+      this.selectId.changeTitle(this.titleData.message || '创建标题');
+      this.selectId = '';
+    },
+    stopDocument(e){      // 防止事件冒泡
+      e.stopPropagation();
+    },
+    toJsonFS(){
+      this.$emit('update_value', this.editor.toJsonData())
+    }
   },
 };
 </script>
@@ -111,6 +166,31 @@ export default {
   #editorMindSVGDom{
     width: 100%;
     height: 100%;
+  }
+  
+  *{
+    user-select: none !important;
+  }
+
+  .input_text{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100px;
+    height: 100px;
+    background: #fff;
+    border-radius: 8px;
+
+    .input_message{
+      padding-left:5px;
+      outline-style: none;
+      border: 0px;
+      border-radius: 8px;
+    }
+    .input_message:focus{
+      border: 0px;
+      outline: 0;
+    }
   }
 }
 </style>

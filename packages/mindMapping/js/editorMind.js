@@ -2,7 +2,7 @@
 import UUID from './uuid.js';
 class sprite { // h 60 w 200
     constructor(dom, data, superior, editor ) {
-        
+
         this.dom      = dom;
         this.superior = superior; // 父级信息
         this.editor   = editor;   // 全局信息
@@ -11,8 +11,6 @@ class sprite { // h 60 w 200
         this.x        = data.x;
         this.y        = data.y;
         this.id       = data.id;
-        this.maxY     = data.maxY,
-        this.minY     = data.minY,
         this.index    = data.index;
         this.color    = data.color;
         this.group    = dom.group().move(this.x, this.y);
@@ -43,7 +41,7 @@ class sprite { // h 60 w 200
         this.addBtnMask = this.addBtn.rect(15, 15).fill('transparent').move(0, 0); // 添加
 
         let dblclickFS  = (e)=>{
-            console.log(e);
+                this.editor.dubclickFS(e, this);
             },
             mouseoverFS = (e) => {
                 this.maskBG.animate(200).attr({
@@ -89,7 +87,7 @@ class sprite { // h 60 w 200
             
             this.pathLine   =  this.group.path().fill('transparent').attr({
                 stroke: this.color, 
-                'stroke-width' : 4,
+                'stroke-width' : 3,
                 'marker-start' : 'url(#'+ this.editor.arrowEnd.id() +')',
                 'marker-end'   : 'url(#'+ this.editor.arrowStart.id() +')',
             });
@@ -114,12 +112,11 @@ class sprite { // h 60 w 200
                 },
                 removeClick     = (e)=>{
                     let sptireData = '';
-
                     for(let i = 0; i < this.superior.sprites.length; i++){
                         
                         let sprite = this.superior.sprites[i];
-                            
                         if(this.id == sprite.id){
+
                             sptireData = i == 0 ? 
                                             this.superior.sprites[1] 
                                         : 
@@ -129,7 +126,7 @@ class sprite { // h 60 w 200
                                                     :
                                                 this.superior.sprites[i + 1]
                                             );
-
+                            
                             sprite.group.remove();
                             this.superior.sprites.splice(i, 1);  
                             this.settingSVGSize();
@@ -143,14 +140,12 @@ class sprite { // h 60 w 200
             this.removeBtnMask.click(removeClick);
         }
 
-
-
         this.changeTitle(this.title.tit);
     }
     
     changeTitle(title){     // 改变标题
 
-        let tit = title.length > 7 ? (title.slice(0, 7) + '...') : title;
+        let tit = title.length > this.editor.fontStyle.num ? (title.slice(0, this.editor.fontStyle.num) + '...') : title;
         this.title.tit = title;
         this.title.text.text(tit);
         this.autoPosition();        
@@ -210,15 +205,22 @@ class sprite { // h 60 w 200
             
             end.y = start.y;
             startLineC = ' L ' + end.x + ',' + start.y;
-        }else{
-            startLineC = 'C ' + (start.x) + ',' + (end.y) 
-                                    + ' ' + 
-                                (start.x + 30) + ',' + (end.y) 
-                                    + ' ' + 
-                                (end.x) + ',' + (end.y);
-                                // 'S '+ end.x - 20 + ' ' + end.y + end.x + ',' + end.y;
-        }
 
+        }else if(judgeY < (this.editor.spacing * 0.6) && judgeY > -(this.editor.spacing * 0.6) ){
+            startLineC = `
+                            Q  ${start.x + (this.editor.spacing * 0.3)} , ${start.y} 
+                               ${end.x} , ${end.y}
+            `;
+                                // 'S '+ end.x - 20 + ' ' + end.y + end.x + ',' + end.y;
+        }else{
+            startLineC = `
+                        Q  ${start.x + (this.editor.spacing * 0.3)} , ${start.y} 
+                           ${start.x + (this.editor.spacing * 0.3)} , ${start.y > end.y ? (start.y -(this.editor.spacing * 0.4)) : (start.y + (this.editor.spacing * 0.4))}
+                        Q  ${start.x + (this.editor.spacing * 0.3)} , ${end.y} 
+                           ${end.x   - 1}  , ${end.y}
+                        L  ${end.x},${end.y}`;
+        }
+        
         let line = 'M ' + start.x + ',' + start.y + startLineC ;
         return line;
     }
@@ -233,7 +235,7 @@ class sprite { // h 60 w 200
         let posSprite = (data)=>{
 
             this.editor.getSpriteY(data, 0);
-            if(data.superior && data.superior.sprites){
+            if(data && data.superior && data.superior.sprites){
                 posSprite(data.superior)
             }
         }
@@ -247,7 +249,8 @@ class sprite { // h 60 w 200
 
         let color = this.color;
         if(this.index == 0){
-            color = this.superior.colorList[ this.sprites.length % 5 ];
+            color = '#'+Math.floor(Math.random()*(2<<23)).toString(16); ;
+
         }
 
         let size = this.font.size * 0.8;
@@ -256,19 +259,20 @@ class sprite { // h 60 w 200
 
         spriteY.spriteY = spriteY.spriteY - 5;
         this.editor.addSprite({
+            title : '创建标题',
             x     : spriteX,
             y     : spriteY.spriteY,
             index : this.index,
             dom   : this.group,
             id    : this.id + '___' + this.sprites.length,
             color : color,
-            minY  : this.minY,
-            maxY  : this.maxY,
             data  : this,
             size  : size,
+            
         }).then(item => {
             this.sprites.push(item);
             this.spritesPosition(item);
+            this.editor.toJsonFS();
         });
     }
 
@@ -305,6 +309,19 @@ class sprite { // h 60 w 200
         }
         return height;
     }
+
+    toJsonData(){
+        let jsonData = {
+            x     : this.x,
+            y     : this.y,
+            title : this.title.tit,
+            index : this.index,
+            color : this.color,
+            size  : this.font.size,
+            sprites : [],
+        };
+        return jsonData;
+    }
 };
 
 
@@ -314,10 +331,20 @@ export default class {
         this.data = data;
         this.dom  = this.SVG(data.domId);
 
+        this.topColor  = data.topColor || '#ff2970';
+
         this.width     = data.width;
         this.height    = data.height;
         this.oldWidth  = data.width;
         this.oldHeight = data.height;
+
+        this.fontStyle = {
+            size : data.fontStyle.size || 40,
+            num  : data.fontStyle.num  || 7,
+        }
+        
+        this.dubclickFS = data.dubclickFS;
+        this.toJsonFS   = data.toJsonFS;
 
         this.spacing= data.spacing || 50;
         this.dom.size(this.width, this.height);
@@ -325,19 +352,12 @@ export default class {
         this.iconDom    = this.dom.defs()
         this.arrowStart = this.iconDom.marker(6, 6, (add) => {
             add.attr({ orient : "auto" })
-            add.path("M1,1 L5,3 L1,5 L3,3 L1,1").fill('red');
+            add.path("M1,1 L5,3 L1,5 L3,3 L1,1").fill( this.topColor );
         }); 
         this.arrowEnd   = this.iconDom.marker(3, 3, (add) => {
-            add.circle(3).fill('#f06');
+            add.circle(3).fill( this.topColor );
         }); 
 
-        this.colorList = [
-            '#414042',
-            '#0043A4',
-            '#004156',
-            '#008736',
-            '#D2AA1B',
-        ];
         this.UUID  = new UUID();
         this.title = new sprite(
             this.dom, 
@@ -346,11 +366,9 @@ export default class {
                 index : 0,
                 x     : 5,
                 y     : this.height/2,
-                color : '#ff2970',
+                color : this.topColor,
                 id    : this.UUID.generate(),
-                minY  : 0,
-                maxY  : this.height,
-                size  : data.size || 40,
+                size  : this.fontStyle.size || 40,
             },
             this,
             this,
@@ -362,23 +380,85 @@ export default class {
       return '(' + this.x + ', ' + this.y + ')';
     }
     
-    fromJson() {
+    fromJson(jsonData) {
+        if(!jsonData)return;
 
+        jsonData = JSON.parse(jsonData);
+        this.title.group.remove();
+        
+        jsonData.x     = 5;
+        jsonData.y     = this.height/2;
+        jsonData.id    = this.UUID.generate();
+        jsonData.color = this.topColor;
+
+        this.title = new sprite(
+            this.dom, 
+            jsonData,
+            this,
+            this,
+        );
+        
+        let addSprites = (data, superior)=>{
+
+            let sprites = data.sprites;
+                
+            for(let i = 0; i < sprites.length; i++){
+
+                let item = sprites[i];
+                item.id = superior.id + '___' + i;
+
+                let newSuperior = new sprite(
+                    superior.group, 
+                    item,
+                    superior,
+                    this,
+                );
+
+                superior.sprites.push(newSuperior);
+                
+                if(item.sprites.length){
+                    addSprites(item, newSuperior);
+                }
+
+            }
+        }
+        addSprites(jsonData, this.title);
+        return 
     }
 
+    toJsonData() {
+        
+        let jsonData = this.title.toJsonData();
+
+        let getData = (data, json) => {
+
+            let sprites = data;
+            for(let i = 0; i < sprites.length; i++){
+
+                let item = sprites[i];
+                json.push(item.toJsonData())
+                if(item.sprites.length){
+                    getData(item.sprites, json[i].sprites);
+                }
+
+            }
+            return json;
+        }
+        getData(this.title.sprites, jsonData.sprites)
+        return JSON.stringify(jsonData);
+    }
+    
     addSprite(data){
 
         let item = new sprite(
             data.dom, 
             {
-                title : '创建标题',
+                title : data.title,
                 index : data.index + 1,
                 x     : data.x,
                 y     : data.y,
                 color : data.color,
                 id    : data.id,
-                minY  : data.minY,
-                maxY  : data.maxY,
                 size  : data.size || 14,
             },
             data.data,
@@ -458,7 +538,6 @@ export default class {
                 }
 
                 let top       = -((allHeight + addHeight) / 2) + (heightSprite / 2) + heightSprite;
-                console.log(top, heightSprite,  allHeight, heightSprite)
                 
                 for(let i = 0; i < spritesLength; i++){
 
