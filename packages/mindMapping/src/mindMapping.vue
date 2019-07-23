@@ -111,7 +111,6 @@ export default {
     
         window.TOOL = this.editor;
         if(this.value){
-          console.log(this.value)
           this.editor.fromJson(this.value)
         }
         clearInterval(setTime);
