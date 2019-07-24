@@ -4,8 +4,9 @@ A Vue component to mind-mapping
 一个类似思维导图的小工具
 
  ## demo演示
- [demo](https://wei-zhe.github.io/)
- 
+ [demo](https://wei-zhe.github.io/#/mind)
+
+ ![dragScreenshot](./readmeimg/action.jpeg) 
  ## 安装
  
  ```JS
@@ -15,6 +16,20 @@ A Vue component to mind-mapping
  ## 使用
  
  ```js
+使用之前一定要安装svg.js
+svg.js
+    import svgJs from "svg.js/dist/svg"
+
+    export default {
+        install(Vue) {
+            Vue.prototype.$svg = svgJs
+        }
+    }
+
+main.js
+    import svgJs from "./svg.js"
+    Vue.use(svgJs);
+
  // ES6
  import vuemindmapping from 'vue-mind-mapping'
  
@@ -84,4 +99,3 @@ A Vue component to mind-mapping
  | fontSize    | Number	  | 40      | 选择参数，也可以不传
  | fontLength  | Number	  | 7       | 选择参数，也可以不传
  
- ![dragScreenshot](./readmeimg/action.png)
