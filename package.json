@@ -1,7 +1,15 @@
 {
   "name": "vue-mind-mapping",
-  "version": "0.1.0",
-  "private": true,
+  "description": "A Vue component to mind-mapping",
+  "version": "1.0.0",
+  "author": "WeiZhe <2270734250@qq.com>",
+  "license": "MIT",
+  "private": false,
+  "main": "lib/tag-textarea.umd.min.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wei-zhe/vue-mind-mapping.git"
+  }, 
   "scripts": {
     "serve" : "vue-cli-service serve",
     "build" : "vue-cli-service build",
