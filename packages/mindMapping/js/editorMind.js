@@ -134,6 +134,7 @@ class sprite { // h 60 w 200
                         }
                     }
                     this.superior.spritesPosition(sptireData);
+                    this.editor.toJsonFS();
                 };
             this.removeBtnMask.mouseover(removeMouseover);
             this.removeBtnMask.mouseout(removeMouseout);
@@ -148,7 +149,10 @@ class sprite { // h 60 w 200
         let tit = title.length > this.editor.fontStyle.num ? (title.slice(0, this.editor.fontStyle.num) + '...') : title;
         this.title.tit = title;
         this.title.text.text(tit);
-        this.autoPosition();        
+        this.autoPosition().then((data) => {
+            this.spritesPosition(data);
+            this.editor.toJsonFS();
+        }); 
     }
     
     autoPosition(){         // 自动计算定位
@@ -185,6 +189,7 @@ class sprite { // h 60 w 200
         this.height   = height + 10;
         
         this.settingSVGSize();
+        return Promise.resolve(this);
 
     }
 
@@ -231,7 +236,7 @@ class sprite { // h 60 w 200
         this.autoPosition();
     }
 
-    spritesPosition(data){ // 删除没有写完
+    spritesPosition(data){
         let posSprite = (data)=>{
 
             this.editor.getSpriteY(data, 0);
@@ -561,7 +566,7 @@ export default class {
                     if(sprite.getSpriteHeight()){
                         y += ((sprite.getSpriteHeight() / 2) - 20);
                     }
-                    sprite.movePosition({y : y})
+                    sprite.movePosition({y : y, x : data.width + this.spacing})
                 }
                 let h = data.sprites[ data.sprites.length - 1 ].y
                             +

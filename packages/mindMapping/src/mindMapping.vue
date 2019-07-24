@@ -109,7 +109,7 @@ export default {
           }
         );
     
-        window.TOOL = this.editor;
+        window._TOOL = this.editor;
         if(this.value){
           this.editor.fromJson(this.value)
         }
@@ -152,7 +152,10 @@ export default {
       e.stopPropagation();
     },
     toJsonFS(){
-      this.$emit('update_value', this.editor.toJsonData())
+      if(this.editor){
+
+        this.$emit('update_value', this.editor.toJsonData())
+      }
     }
   },
 };
