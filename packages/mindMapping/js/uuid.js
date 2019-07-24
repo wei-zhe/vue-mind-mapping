@@ -1,6 +1,6 @@
 // 生成不唯一的id值
 export default class {
-    constructor(svg) {
+    constructor() {
 
     }
     

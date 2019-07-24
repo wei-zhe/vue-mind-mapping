@@ -569,8 +569,6 @@ export default class {
                 let h = data.sprites[ data.sprites.length - 1 ].y
                             +
                         (data.sprites[ data.sprites.length - 1 ].getSpriteHeight() / 2);
-
-                spriteHeight = (data.sprites[ data.sprites.length - 1 ].getSpriteHeight() / 2);
                                
                 spriteY = (heightSprite / 2) + h + (heightSprite * 2) -20;
                 // spriteY = allHeight/2 - (heightSprite / 2) + (addHeight);
