@@ -1,6 +1,6 @@
 // 生成不唯一的id值
 export default class {
-    constructor(svg, data) {
+    constructor(svg) {
 
     }
     
@@ -82,4 +82,4 @@ export default class {
       var testPattern = /^[0-9a-f]{8}_[0-9a-f]{4}_4[0-9a-f]{3}_[89ab][0-9a-f]{3}_[0-9a-f]{12}$/i;
       return testPattern.test(uuid);
     }
-};
+}

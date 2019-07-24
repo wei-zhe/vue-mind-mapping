@@ -76,8 +76,8 @@ A Vue component to mind-mapping
  
  |   name      |   type   | default | type |
  | --------    | :------: | :-----: | ---- |
- | value       | String	  |         |（必传）
- | width       | Number	  | 500     |（选择参数，也可以不传
+ | value       | String	  |         | 必传
+ | width       | Number	  | 500     | 选择参数，也可以不传
  | height      | Number	  | 500     | 选择参数，也可以不传
  | spacing     | Number	  | 50      | 选择参数，也可以不传
  | topColor    | String	  | #ff2970 | 选择参数，也可以不传

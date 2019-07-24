@@ -43,7 +43,7 @@ class sprite { // h 60 w 200
         let dblclickFS  = (e)=>{
                 this.editor.dubclickFS(e, this);
             },
-            mouseoverFS = (e) => {
+            mouseoverFS = () => {
                 this.maskBG.animate(200).attr({
                     fill: '#bcbec0', 
                     'fill-opacity': 1, 
@@ -51,7 +51,7 @@ class sprite { // h 60 w 200
                 this.title.rect.animate(200).fill('#fff')
                 this.title.text.animate(200).fill('#474261');
             },
-            mouseoutFS  = (e) => {
+            mouseoutFS  = () => {
                 this.maskBG.animate(200).attr({
                     fill: this.color, 
                     'fill-opacity': 1, 
@@ -63,20 +63,20 @@ class sprite { // h 60 w 200
         this.mask.mouseover(mouseoverFS);
         this.mask.mouseout(mouseoutFS);
         
-        let addMouseover = (e)=>{
+        let addMouseover = ()=>{
                 this.addBtnC.animate(200).attr({
                     fill: this.color, 
                     'fill-opacity': 1, 
                 });
             },
-            addMouseout  = (e)=>{
+            addMouseout  = ()=>{
             
                 this.addBtnC.animate(200).attr({
                     fill: '#d1d3d5', 
                     'fill-opacity': 1, 
                 });
             },
-            addClick     = (e)=>{
+            addClick     = ()=>{
                 this.addSprite();
             };
         this.addBtnMask.mouseover(addMouseover);
@@ -97,20 +97,20 @@ class sprite { // h 60 w 200
             this.removeBtn.text('-').font({size   : 20,}).fill('#fff').move(4, -5);       // 添加
             this.removeBtnMask = this.removeBtn.rect(15, 15).fill('transparent').move(0, 0); // 添加
             
-            let removeMouseover = (e)=>{
+            let removeMouseover = ()=>{
                 this.removeBtnC.animate(200).attr({
                     fill: this.color, 
                     'fill-opacity': 1, 
                 });
                 },
-                removeMouseout  = (e)=>{
+                removeMouseout  = ()=>{
                 
                     this.removeBtnC.animate(200).attr({
                         fill: '#d1d3d5', 
                         'fill-opacity': 1, 
                     });
                 },
-                removeClick     = (e)=>{
+                removeClick     = ()=>{
                     let sptireData = '';
                     for(let i = 0; i < this.superior.sprites.length; i++){
                         
@@ -247,14 +247,13 @@ class sprite { // h 60 w 200
         posSprite(data)
     }
 
-    addSprite(e){
+    addSprite(){
         let spriteX = this.width + this.editor.spacing,
-            spriteY = this.editor.getSpriteY(this, 1),
-            bboxData= this.getSpriteHeight();
+            spriteY = this.editor.getSpriteY(this, 1);
 
         let color = this.color;
         if(this.index == 0){
-            color = '#'+Math.floor(Math.random()*(2<<23)).toString(16); ;
+            color = '#'+Math.floor(Math.random()*(2<<23)).toString(16);
 
         }
 
@@ -327,7 +326,7 @@ class sprite { // h 60 w 200
         };
         return jsonData;
     }
-};
+}
 
 
 export default class {
@@ -523,7 +522,6 @@ export default class {
 
             let spriteY       =  data.height / 2;
             let spritesLength = data.sprites.length;
-            let spriteHeight  = 0;
 
             if(spritesLength){
                 let heightSprite = data.sprites[0].height;

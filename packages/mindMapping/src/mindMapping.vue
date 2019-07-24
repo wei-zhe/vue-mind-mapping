@@ -117,7 +117,7 @@ export default {
       }
     });
 
-    document.onclick = (event) => {
+    document.onclick = () => {
       this.selectId = '';
     };
     
