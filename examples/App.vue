@@ -9,6 +9,7 @@
       topColor    = '#646464'
       :fontSize   = '30'
       :fontLength = '10'
+      :onlyColor  = 'true'
     ></MindMapping>
   </div>
 </template>

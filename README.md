@@ -43,6 +43,7 @@ main.js
     topColor    = '#646464'
     :fontSize   = '30'
     :fontLength = '10'
+    :onlyColor  = 'true'
 ></MindMapping>
 
  ```
@@ -60,6 +61,9 @@ main.js
 
 ### fontLength
 每个标题显示的字数显示不玩的会用...代替
+
+### onlyColor
+设置图标颜色为单一颜色
 
 ## v-model
 会返回一个json字符串，代表生成的导图数据格式，
@@ -98,4 +102,6 @@ main.js
  | topColor    | String	  | #ff2970 | 选择参数，也可以不传
  | fontSize    | Number	  | 40      | 选择参数，也可以不传
  | fontLength  | Number	  | 7       | 选择参数，也可以不传
+ | onlyColor   | Boolean  | false   | 选择参数，也可以不传
+
  

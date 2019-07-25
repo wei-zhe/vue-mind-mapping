@@ -253,7 +253,7 @@ class sprite { // h 60 w 200
 
         let color = this.color;
         if(this.index == 0){
-            color = '#'+Math.floor(Math.random()*(2<<23)).toString(16);
+            color = this.editor.onlyColor ? this.color : '#'+Math.floor(Math.random()*(2<<23)).toString(16);
 
         }
 
@@ -341,6 +341,7 @@ export default class {
         this.height    = data.height;
         this.oldWidth  = data.width;
         this.oldHeight = data.height;
+        this.onlyColor = data.onlyColor || false;
 
         this.fontStyle = {
             size : data.fontStyle.size || 40,

@@ -76,6 +76,10 @@ export default {
       type    : Number,
       default : 7,
     },
+    onlyColor : {
+      type    : Boolean,
+      default : false,
+    },
   },
   watch: {
 
@@ -105,7 +109,8 @@ export default {
               num  : this.fontLength,    // 每个标题显示的字数显示不玩的会用...代替
             },
             dubclickFS: this.editorDubclick,
-            toJsonFS  : this.toJsonFS, 
+            toJsonFS  : this.toJsonFS,
+            onlyColor : this.onlyColor, 
           }
         );
     
