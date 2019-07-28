@@ -130,28 +130,25 @@ export default {
   },
   methods: {
     editorDubclick(e, data){
-
       let dom = this.$refs[this.editorId].getBoundingClientRect();
       e   = e.target.getBoundingClientRect();
       
       this.selectId = data;
-      let styleArr = {
-        width      : e.width  + 'px',
-        height     : e.height + 'px',
-        top        : e.y - dom.y  + 'px',
-        left       : e.x - dom.x  + 'px',
+      this.selectInputStyle = {
+        width      : e.width  - 6 + 'px',
+        height     : e.height - 2 + 'px',
         fontSize   : this.selectId.font.size + 'px',
         fontWeight : 'bold',
       };
-      this.selectInputStyle = Object.assign({}, styleArr);
-      this.selectBoxStyle   = Object.assign({}, styleArr);
-
+      this.selectBoxStyle   = {
+        width      : e.width  + 'px',
+        height     : e.height + 'px',
+        fontSize   : this.selectId.font.size + 'px',
+        fontWeight : 'bold',
+        top        : e.y - dom.y  + 'px',
+        left       : e.x - dom.x  + 'px',
+      };
       this.titleData.message       = this.selectId.title.tit;
-      this.selectInputStyle.width  = e.width  - 6  + 'px';
-      this.selectInputStyle.height = e.height - 2  + 'px';
-      delete this.selectInputStyle.top;
-      delete this.selectInputStyle.left;
-      
     },
     setTitle(){
       this.selectId.changeTitle(this.titleData.message || '创建标题');
