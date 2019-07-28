@@ -149,8 +149,8 @@ export default {
       this.titleData.message       = this.selectId.title.tit;
       this.selectInputStyle.width  = e.width  - 6  + 'px';
       this.selectInputStyle.height = e.height - 2  + 'px';
-      this.selectInputStyle.top    = '0px';
-      this.selectInputStyle.left   = '0px';
+      delete this.selectInputStyle.top;
+      delete this.selectInputStyle.left;
       
     },
     setTitle(){
