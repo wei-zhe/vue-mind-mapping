@@ -135,7 +135,7 @@ export default {
       e   = e.target.getBoundingClientRect();
       
       this.selectId = data;
-      this.selectInputStyle = this.selectBoxStyle = {
+      let styleArr = {
         width      : e.width  + 'px',
         height     : e.height + 'px',
         top        : e.y - dom.y  + 'px',
@@ -143,10 +143,14 @@ export default {
         fontSize   : this.selectId.font.size + 'px',
         fontWeight : 'bold',
       };
+      this.selectInputStyle = Object.assign({}, styleArr);
+      this.selectBoxStyle   = Object.assign({}, styleArr);
 
       this.titleData.message       = this.selectId.title.tit;
       this.selectInputStyle.width  = e.width  - 6  + 'px';
       this.selectInputStyle.height = e.height - 2  + 'px';
+      this.selectInputStyle.top    = '0px';
+      this.selectInputStyle.left   = '0px';
       
     },
     setTitle(){
